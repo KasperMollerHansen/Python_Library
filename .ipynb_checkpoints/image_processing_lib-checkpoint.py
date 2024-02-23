@@ -80,7 +80,7 @@ def count_elements(img): # Function for counting elements on image
     return num_of_elements, elements
 
 def apply_colors(img):
-    colors = ['black', 'red', 'blue', 'green', 'yellow', 'orange','purple']
+    colors = ['black', 'red', 'blue', 'green', 'yellow', 'orange','purple','cyan','magenta']
     num_colors = len(colors)
     
     # Create a custom colormap
