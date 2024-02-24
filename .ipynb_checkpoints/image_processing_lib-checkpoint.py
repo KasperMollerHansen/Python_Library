@@ -14,16 +14,16 @@ def rgb2gray(rgb, coefficient = [0.2989, 0.5870 , 0.1141]):
     gray = coefficient[0] * r + coefficient[1] * g + coefficient[2] * b
     return gray
 
-def background_equalizer(img, x_thresh=0.4, y_thresh=0.4, thresh=15):
+def background_equalizer(img, x_thresh=0.4, y_thresh=0.4, scale = 3, thresh=190):
     # Calculate row-wise and column-wise quantiles
     row_quantiles = np.quantile(img, x_thresh, axis=1)
     col_quantiles = np.quantile(img, y_thresh, axis=0)
     # Calculate mean background
     background = (row_quantiles[:, np.newaxis] + col_quantiles) / 2.0
     # Compute the difference between the image and the background
-    img_new = img - background
+    img_new = (img - background)*scale
     # Set negative values resulting from subtraction to 0
-    img_new[img_new < 0] = 0
+    img_new = np.clip(img_new, 0, 255)
     # Binarize the resulting image based on the provided threshold
     img_bw = img_new > thresh
     return background, img_new, img_bw
