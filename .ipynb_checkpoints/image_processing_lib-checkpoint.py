@@ -96,7 +96,7 @@ def morphFilter(img, selem, function):
 
 def replace_similar(original,processed,thresh):
     restored = processed.copy()
-    val = np.clip((original-restored),0,255)
+    val = np.abs(original-restored)
     for i in range(np.shape(val)[0]):
         for j in range(np.shape(val)[1]):
             if val[i,j]<thresh:
