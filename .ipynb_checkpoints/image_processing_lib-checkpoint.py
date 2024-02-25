@@ -73,46 +73,33 @@ def apply_colors(img):
     plt.imshow(np.where(img== 0, 0, img % (num_colors - 1) + 1), cmap=cmap, interpolation='nearest')
     plt.show()
 
-def remove_text(img,kernel,window_dim,val_thresh=255):
+def morphFilter(img, selem, function):
+    # Add padding to the image
+    s = selem.shape[1]//2 #pad width
+    t = selem.shape[0]//2 #pad height
+    img = np.pad(img, pad_width=((t,t),(s,s)))
     
-    def erode_dilate_img(window,kernel,val_thresh):
-        num = num_above_thresh(window, val_thresh)
-        if num >= 1:
-            window = cv2.erode(window*1.00, kernel, iterations=3)
-            window = cv2.dilate(window*1.00, kernel, iterations=1)
-        return window
-
-    def num_above_thresh(matrix, threshold):
-        count = 0
-        for row in matrix:
-            for num in row:
-                if num > threshold:
-                    count += 1
-        return count
-
-    def replace_similar(original,restored,thresh):
-        val = np.clip((original-restored),0,255)
-        for i in range(np.shape(val)[0]):
-            for j in range(np.shape(val)[1]):
-                if val[i,j]<thresh:
-                    restored[i,j] = original[i,j]
-        return restored
-
-    max_dim = np.shape(img)
-    img_copy = np.zeros(max_dim)
-    for i in range(0,int(max_dim[0]/window_dim[0])+1):
-        for j in range(0,int(max_dim[1]/window_dim[1])+1):
-            window = img[i*window_dim[0]:(i+1)*window_dim[0], j*window_dim[0]:(j+1)*window_dim[0]]
-            window = erode_dilate_img(window,kernel,val_thresh) # Remove the text
-            img_copy[i*window_dim[0]:(i+1)*window_dim[0], j*window_dim[0]:(j+1)*window_dim[0]] += window
+    #Create empty output image
+    imout = np.zeros(img.shape, dtype=np.uint8)
     
-    img_copy = cv2.erode(img_copy*1.00, kernel, iterations=1)
-    img_copy = replace_similar(img,img_copy,100)
-    img_copy = cv2.erode(img_copy*1.00, kernel, iterations=1)
-    img_copy = replace_similar(img,img_copy,30)
-    img_copy = cv2.erode(img_copy*1.00, kernel, iterations=1)
-    img_copy = cv2.dilate(img_copy*1.00, kernel, iterations=3)
-    img_copy = replace_similar(img,img_copy,20)
-    img_copy[0,0] = 255
+    #loop through all pixels except for padding
+    for row in range(t,img.shape[0]-t): 
+        for col in range(s,img.shape[1]-s):
+            
+            # extract pixels within structuring element
+            se_tmp = img[row-t:row+t+1, col-s:col+s+1]
+            
+            #Select pixels in structure element and apply function (min, max)
+            imout[row,col] = function(se_tmp[selem>0])
+            
+    #remove padding
+    return imout[s:-s,t:-t]
 
-    return img_copy
+def replace_similar(original,processed,thresh):
+    restored = processed.copy()
+    val = np.clip((original-restored),0,255)
+    for i in range(np.shape(val)[0]):
+        for j in range(np.shape(val)[1]):
+            if val[i,j]<thresh:
+                restored[i,j] = original[i,j]
+    return restored
