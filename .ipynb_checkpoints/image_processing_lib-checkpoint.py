@@ -29,14 +29,13 @@ def background_equalizer(img, x_thresh=0.4, y_thresh=0.4, scale = 3, thresh=190)
     return background, img_new, img_bw
 
 def count_elements(img): # Function for counting elements on image
+    
     def check_neighbours(img, list_ij):
         max_size = img.shape
         list_new = set()  # Using set for faster duplicate removal
-        
         for index in list_ij:
             x, y = index
             neighbors = [(x, y+1), (x, y-1), (x+1, y), (x-1, y)]
-            
             for coor in neighbors:
                 i, j = coor
                 if 0 <= i < max_size[0] and 0 <= j < max_size[1]:
@@ -44,6 +43,7 @@ def count_elements(img): # Function for counting elements on image
                     if val != 0:  # Avoid multiplication by zero
                         list_new.add(coor * int(val))
         return list(list_new)
+        
     elements = 0
     num_of_elements = 0
     img_original = img
