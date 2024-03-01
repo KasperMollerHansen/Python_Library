@@ -14,7 +14,7 @@ def rgb2gray(rgb, coefficient = [0.2989, 0.5870 , 0.1141]):
     gray = coefficient[0] * r + coefficient[1] * g + coefficient[2] * b
     return gray
 
-def background_equalizer(img, x_thresh=0.4, y_thresh=0.4, scale = 3, thresh=190):
+def background_equalizer(img, x_thresh=0.4, y_thresh=0.4, scale = 3, thresh=190): # Function for equalizing the background of an image
     # Calculate row-wise and column-wise quantiles
     row_quantiles = np.quantile(img, x_thresh, axis=1)
     col_quantiles = np.quantile(img, y_thresh, axis=0)
@@ -30,7 +30,7 @@ def background_equalizer(img, x_thresh=0.4, y_thresh=0.4, scale = 3, thresh=190)
 
 def count_elements(img): # Function for counting elements on image
     
-    def check_neighbours(img, list_ij):
+    def check_neighbours(img, list_ij): # function for listing neigherbour pixels that is "1" in a list.
         max_size = img.shape
         list_new = set()  # Using set for faster duplicate removal
         for index in list_ij:
@@ -64,7 +64,7 @@ def count_elements(img): # Function for counting elements on image
                 num_of_elements += 1
     return num_of_elements, elements
 
-def apply_colors(img):
+def apply_colors(img): # apply different colors to different interger values. Set 0 to black as a background
     colors = ['black', 'red', 'blue', 'purple','darkgreen', 'yellow', 'orange','cyan','magenta','lime']
     num_colors = len(colors)
     cmap = ListedColormap(colors)
@@ -72,7 +72,7 @@ def apply_colors(img):
     plt.imshow(np.where(img== 0, 0, img % (num_colors - 1) + 1), cmap=cmap, interpolation='nearest')
     plt.show()
 
-def morphFilter(img, selem, function):
+def morphFilter(img, selem, function): # Morph filter that can be used to dilation, erosion and median filter
     # Add padding to the image
     s = selem.shape[1]//2 #pad width
     t = selem.shape[0]//2 #pad height
@@ -84,17 +84,14 @@ def morphFilter(img, selem, function):
     #loop through all pixels except for padding
     for row in range(t,img.shape[0]-t): 
         for col in range(s,img.shape[1]-s):
-            
             # extract pixels within structuring element
             se_tmp = img[row-t:row+t+1, col-s:col+s+1]
-            
             #Select pixels in structure element and apply function (min, max)
             imout[row,col] = function(se_tmp[selem>0])
-            
     #remove padding
     return imout[s:-s,t:-t]
 
-def replace_similar(original,processed,thresh):
+def replace_similar(original,processed,thresh): # After a opening (erosion then dilation) we can replace similar pixels, with the orginal pixels
     restored = processed.copy()
     val = np.abs(original-restored)
     for i in range(np.shape(val)[0]):
