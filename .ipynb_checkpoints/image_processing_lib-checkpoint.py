@@ -99,3 +99,27 @@ def replace_similar(original,processed,thresh): # After a opening (erosion then 
             if val[i,j]<thresh:
                 restored[i,j] = original[i,j]
     return restored
+
+def create_disk_filter(im,radius): # Create a disk for filter usage
+    n,m = np.shape(im)
+    # Create an n x m matrix filled with zeros
+    matrix = np.zeros((n, m))
+    # Calculate center coordinates
+    center_x = (n-1) / 2
+    center_y = (m-1) / 2
+    # Iterate through each cell of the matrix
+    for i in range(n):
+        for j in range(m):
+            # Calculate distance from center
+            distance = np.sqrt((i - center_x)**2 + (j - center_y)**2)
+            # If distance is less than or equal to x, set value to 1
+            if distance <= radius:
+                matrix[i][j] = 1
+    return matrix
+
+def fft(im):
+    fourier = np.fft.fftshift(np.fft.fft2(im))
+    fourier_dB = np.log10(abs(fourier)+np.finfo(float).eps)
+    return fourier,fourier_dB
+def ifft(im):
+    return abs(np.fft.ifft2(np.fft.ifftshift(im)))
