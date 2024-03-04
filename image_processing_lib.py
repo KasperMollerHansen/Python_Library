@@ -86,7 +86,7 @@ def morphFilter(img, selem, function): # Morph filter that can be used to dilati
         for col in range(s,img.shape[1]-s):
             # extract pixels within structuring element
             se_tmp = img[row-t:row+t+1, col-s:col+s+1]
-            #Select pixels in structure element and apply function (min, max)
+            #Select pixels in structure element and apply function (min, max, median)
             imout[row,col] = function(se_tmp[selem>0])
     #remove padding
     return imout[s:-s,t:-t]
@@ -117,9 +117,9 @@ def create_disk_filter(im,radius): # Create a disk for filter usage
                 matrix[i][j] = 1
     return matrix
 
-def fft(im):
+def fft(im): #Fourier transform with frequency shift
     fourier = np.fft.fftshift(np.fft.fft2(im))
     fourier_dB = np.log10(abs(fourier)+np.finfo(float).eps)
     return fourier,fourier_dB
-def ifft(im):
+def ifft(im): #inverseFourier transform with frequency shift
     return abs(np.fft.ifft2(np.fft.ifftshift(im)))
