@@ -17,7 +17,7 @@ def download(stock,start=None, end=None,period=None):
     data.name = stock
     return data
 
-def stock_plot(data,type="Close",ax = plt, grid = "True",title = "True"):
+def stock_plot(data,type="Close",ax = plt, grid = "True",title = "False"):
     if type == "Close":
         ax.plot(data.index[:],data["Close"], color = "Black")
     elif type == "Candle":        
